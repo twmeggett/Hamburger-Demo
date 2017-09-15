@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hamburger Demo</title>
+<style>
+
+* {
+    font-family: Arial, Times, serif;
+}
+
+h1, h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+xmp {
+    padding: 20px;
+    font-family: Menlo, Monaco, "Courier New", Courier, monospace;
+    font-size: 15px;
+    overflow: scroll;
+    background: #e0e0e0;
+}
+
+#hamburger {
+    position: relative;
+    border-radius: 100%;
+    height: 75px;
+    width: 75px;
+    margin: 0 auto;
+    background-color: whitesmoke;
+} 
+
+#hamburger .wrapper {
+    position: absolute;
+    top: 25%;
+    left: 1px;
+    right: 1px;
+}
+
+#hamburger .bar {
+    position: absolute;
+    width: 49px;
+    height: 8px;
+    background-color: #4fc1e6;
+    left: 12px;
+}
+
+#hamburger #bar1 {
+    top: 5px;
+}
+
+#hamburger #bar2 {
+    top: 15px;
+}
+
+#hamburger #bar3 {
+    top: 25px;
+}
+
+#codeReview {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+#codeReview p {
+    font-size: 24px;
+    text-indent: 30px;
+}
+
+#scrollTop {
+    position: fixed;
+    border-radius: 100%;
+    height: 0px;
+    width: 0px;
+    font-weight: bold;
+    color: #4fc1e6;
+    text-align: center;
+    background-color: whitesmoke;
+    overflow: hidden;
+}
+
+#scrollTop p {
+    position: relative;
+    top: -7px;
+    font-size: 28px;
+}
+
+.hide {
+    display: none;
+}
+
+@keyframes fadeOut {
+    0%   {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+@keyframes rotateDownToRight {
+    0%   {top: 5px; transform: rotate(0deg);}
+    100% {top: 15px; transform: rotate(45deg); }
+}
+
+@keyframes rotateDownToLeft {
+    0%   {top: 25px; transform: rotate(0deg);}
+    100% {top: 15px; transform: rotate(-45deg)}
+}
+
+@keyframes fadeIn {
+    0%   {opacity: 0;}
+    100% {opacity: 1;}
+}
+
+@keyframes rotateUpToRight {
+    0%   {top: 15px; transform: rotate(45deg);}
+    100% {top: 5px; transform: rotate(0deg);}
+}
+
+@keyframes rotateUpToLeft {
+    0%   {top: 15px; transform: rotate(-45deg);}
+    100% {top: 25px; transform: rotate(0deg)}
+}
+
+@keyframes topButtonAppear {
+    0%   {opacity: 0; height: 0; width: 0;}
+    75%  {opacity: 1; height: 90px; width: 90px;}
+    100% {opacity: 1; height: 75px; width: 75px;}
+}
+
+@keyframes topButtonHide {
+    0%   {opacity: 1; height: 75px; width: 75px;}
+    100% {opacity: 0; height: 0; width: 0;}
+}
+
+</style>
+</head>
+<body>
+<div id="scrollTop">
+    <p>Top</p>
+</div>
+
+<h1>Immutable State, CSS3, and ES6 Promises Demo</h1>
+
+<div id="hamburger">
+    <div class="wrapper">
+        <div id="bar1" class="bar"></div>
+        <div id="bar2" class="bar"></div>
+        <div id="bar3" class="bar"></div>
+    </div>
+</div>
+
+<div id="codeReview">
+    <h2>Click the Hamburger To See It In Action</h2>
+    <h2>
+        <a href="#stateHandler">Immutable State</a> / 
+        <a href="#CSShelper"> CSS3</a> / 
+        <a href="#eventListener">ES6 Promises</a> /
+        <a href="#conclusion">Conclusion</a>
+    </h2>
+    <p>In this demo I'm going to use this simple hide / show hamburger toggle button to demonstrate my knowledge of current UI concepts. At least part of my knowledge anyway.</p> 
+
+    <p>Here's the html and css for the hamburger menu</p>
+
+    <p>
+        <code>
+            <xmp>
+<style>            
+    #hamburger {
+        position: relative;
+        border-radius: 100%;
+        height: 75px;
+        width: 75px;
+        margin: 0 auto;
+        background-color: whitesmoke;
+    } 
+
+    #hamburger .wrapper {
+        position: absolute;
+        top: 25%;
+        left: 1px;
+        right: 1px;
+    }
+
+    #hamburger .bar {
+        position: absolute;
+        width: 49px;
+        height: 8px;
+        background-color: #4fc1e6;
+        left: 12px;
+    }
+
+    #hamburger #bar1 {
+        top: 5px;
+    }
+
+    #hamburger #bar2 {
+        top: 15px;
+    }
+
+    #hamburger #bar3 {
+        top: 25px;
+    }
+</style>
+<body>
+    <div id="hamburger">
+        <div class="wrapper">
+            <div id="bar1" class="bar"></div>
+            <div id="bar2" class="bar"></div>
+            <div id="bar3" class="bar"></div>
+        </div>
+    </div>
+</body>
+            </xmp>
+        </code>
+    </p>
+    <div id="stateHandler">
+        <h2>Immutable State (Redux knockoff)</h2>
+        <p>This demo is using a single, immutable state, as that is the current meta concerning state management. A store class is created and immediately instatiated.
+        
+        <p>
+            <code>
+                <xmp>
+const store = new function() {
+    //"let" limits the accessibility only to this block of code
+    let state = {
+        menuOpen: true,
+        menuAnimating: false,
+    }
+
+    //following this structure should insure the state 
+    //remains immutable,
+    this.stateHandler = function(action = {type: ''}) {
+        switch (action.type) {
+            case 'openMenu':
+                state = Object.assign({}, state, {
+                    menuOpen: true,
+                    menuAnimating: true
+                })
+                break;
+            case 'closeMenu':
+                state = Object.assign({}, state, {
+                    menuOpen: false,
+                    menuAnimating: true
+                })
+                break;
+            case 'finishAnimating':
+                state = Object.assign({}, state, {
+                    menuAnimating: false,
+                })
+            default:
+                return state;
+        }
+    }
+
+    this.openMenu = function() {
+        this.stateHandler({type: 'openMenu'});
+    }
+
+    this.closeMenu = function() {
+        this.stateHandler({type: 'closeMenu'});
+    }
+
+    this.stopAnimating = function() {
+        this.stateHandler({type: 'finishAnimating'});
+    }
+}
+                </xmp>
+            </code>
+        </p>
+
+        <p>I could have created a new instance and used prototypes for the methods, but since I only ever want one instance of the store I thought this probably most appropriate</p>
+
+        <p>Within the store class I've defined an object named state</p>
+
+        <p>
+            <code>
+            let state = {
+                menuOpen: true,
+                menuAnimating: false,
+            }
+            </code>
+        </p>
+
+        <p>This way the state is only accessible within the class. The state is managed using the <code>stateHandler</code> method.</p>
+
+        <p>
+            <code>
+                <xmp>
+this.stateHandler = function(action = {type: ''}) {
+    switch (action.type) {
+        case 'openMenu':
+            state = Object.assign({}, state, {
+                menuOpen: true,
+                menuAnimating: true
+            })
+            break;
+        case 'closeMenu':
+            state = Object.assign({}, state, {
+                menuOpen: false,
+                menuAnimating: true
+            })
+            break;
+        case 'finishAnimating':
+            state = Object.assign({}, state, {
+                menuAnimating: false,
+            })
+        default:
+            return state;
+    }
+}
+                </xmp>
+            </code>
+        </p>
+
+        <p>It's simply a switch statement looking for a specific action type. Instead of mutating the state, it will create a new object with <code>Object.assign</code> then assign it to state. This prevents random functions from changing the state randomly, a bad thing especially when other developers get their grubby little hands on your beautiful code.</p>
+
+        <p>In order to read the current state, you must call <code>store.stateHandler()</code> and it will be returned. This state determines whether the menu is to be opened or closed on click, and also is a check to see if the menu is still animating.</p>
+        </p>
+    </div>
+
+    <div id="CSShelper">
+        <h2>CSS3 Animation</h2>
+
+        <p>As far as animating the blue bars goes, I created a javascript helper to attach the css3 animation rules and a callback to specified elements.</p>
+
+        <p>
+            <code>
+                <xmp>
+function animateElement(element, rule, seconds, params, callback) {
+    const animationDurationSecs = seconds + 's';
+    const animatedEvents = ['webkitAnimationEnd', 'animationend', 'oanimationend'];
+    const animationProps = {
+        animationName: rule,
+        webkitAnimationName: rule,
+        animationDuration: animationDurationSecs,
+        webkitAnimationDuration: animationDurationSecs
+    };
+    
+    //attach the animation rules and duration 
+    //to the element. This initiates the animation
+    for (prop in animationProps){
+        element.style[prop] = animationProps[prop];
+    }
+
+    //if there are only 4 arguments, the last argument 
+    //can be extra css3 parameters, or a callback
+    if (arguments.length === 4) {   
+        if (typeof arguments[3] === 'function') {
+            callback = arguments[3];
+        }
+    }
+
+    //this is where you can attach extra CSS
+    //parameters, such as animationIterationCount 
+    if (params && typeof params === 'object') {
+        for (param in params) {
+            element.style[param] = params[param];
+        }
+    }
+
+    //attaching a listener for the browser 
+    //appropriate animation end event
+    if(callback && typeof callback === 'function') {
+        animatedEvents.forEach(function(event){
+            element.addEventListener(event, callback);
+        })
+    }
+} 
+                </xmp>
+            </code>
+        </p>
+
+        <p>And here's where all the magic happens, the animation rules...</p>
+            
+        <p>
+            <code>
+                <xmp>
+@keyframes fadeOut {
+    0%   {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+@keyframes rotateDownToRight {
+    0%   {top: 5px; transform: rotate(0deg);}
+    100% {top: 15px; transform: rotate(45deg); }
+}
+
+@keyframes rotateDownToLeft {
+    0%   {top: 25px; transform: rotate(0deg);}
+    100% {top: 15px; transform: rotate(-45deg)}
+}
+
+@keyframes fadeIn {
+    0%   {opacity: 0;}
+    100% {opacity: 1;}
+}
+
+@keyframes rotateUpToRight {
+    0%   {top: 15px; transform: rotate(45deg);}
+    100% {top: 5px; transform: rotate(0deg);}
+}
+
+@keyframes rotateUpToLeft {
+    0%   {top: 15px; transform: rotate(-45deg);}
+    100% {top: 25px; transform: rotate(0deg)}
+}
+                </xmp>
+            </code>
+        </p>
+    </div>
+
+    <div id="eventListener">
+        <h2>ES6 Promises</h2>
+        <p>For the click event, I used ES6 Promises (my favorite thing about ES6) and the store in order to dictate which animation happens, and when the store should be updated.</p>
+
+        <p>
+            <code>
+                <xmp>
+function toggleMenuClickAnimation() {
+    //create a promise to resolve only once the animation has finished
+    const createPromise = function (selector, rule, params, resolveMsg) {
+        return new Promise(function(resolve, reject) {
+            animateElement(document.querySelector(selector), rule, 0.5, params, function() {
+                resolve(resolveMsg);
+            })
+        });
+    }
+
+    if (!store.stateHandler().menuAnimating) {
+        if(store.stateHandler().menuOpen) {
+            const params = {animationFillMode: 'forwards'};
+            const p1 = createPromise('#bar1', 'rotateDownToRight', params, 'bar1 finished');
+            const p2 = createPromise('#bar2', 'fadeOut', params, 'bar2 finished');
+            const p3 = createPromise('#bar3', 'rotateDownToLeft', params, 'bar3 finished');
+
+            //signal to store that menu is closed and is animating
+            store.closeMenu(); 
+
+            Promise.all([p1, p2, p3]).then(values => {
+                //once all bars have finished animating, signal to the store
+                store.stopAnimating();  
+                console.log(values, store.stateHandler());
+            });
+        } else {
+            const params = {animationFillMode: ''};
+            const p1 = createPromise('#bar1', 'rotateUpToRight', params, 'bar1 finished');
+            const p2 = createPromise('#bar2', 'fadeIn', params, 'bar2 finished');
+            const p3 = createPromise('#bar3', 'rotateUpToLeft', params, 'bar3 finished');
+            
+            //signal to store that menu is open and is animating
+            store.openMenu(); 
+
+            Promise.all([p1, p2, p3]).then(values => {
+                //once all bars have finished animating, signal to the store
+                store.stopAnimating();  
+                console.log(values, store.stateHandler());
+            });
+        }
+    }
+}
+                </xmp>
+            </code>
+        </p>
+
+        <p>The click event starts this process off, but only if the state reads that the menu isn't animating anymore. If I were to need to display async data from an http call, I would use these same ES6 promises to handle them, only I would be using the reject argument as well in case they failed</p>
+    </div>
+
+    <div id="conclusion">
+        <h2>Conclusion</h2>
+        <p>Last, but not least, I attach the the event listener inside of an IIFE named init. And that's it!</p>
+        <p>
+            <code>
+                <xmp>
+(function init() {
+    document.querySelector('#hamburger').addEventListener('click', toggleMenuClickAnimation, false);
+})();
+                </xmp>
+            </code>
+        </p>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.min.js"></script>
+<script>
+(function(){
+    //defining and creating a single instance of the store class at the same time
+    const store = new function() {
+        let state = {
+            menuOpen: true,
+            menuAnimating: false,
+            showTopButton: false,
+        }
+        //following this structure should insure the state remains immutable, this.stateHandler() returns the readable only state
+        this.stateHandler = function(action = {type: ''}) {
+            switch (action.type) {
+                case 'openMenu':
+                    state = Object.assign({}, state, {
+                        menuOpen: true,
+                        menuAnimating: true
+                    })
+                    break;
+                case 'closeMenu':
+                    state = Object.assign({}, state, {
+                        menuOpen: false,
+                        menuAnimating: true
+                    })
+                    break;
+                case 'finishAnimating':
+                    state = Object.assign({}, state, {
+                        menuAnimating: false,
+                    })
+                    break;
+                case 'toggleShowTopButton': 
+                    state = Object.assign({}, state, {
+                        showTopButton: !state.showTopButton,
+                    })
+                    break;
+                default:
+                    return state;
+            }
+        }
+
+        this.openMenu = function() {
+            this.stateHandler({type: 'openMenu'});
+        }
+
+        this.closeMenu = function() {
+            this.stateHandler({type: 'closeMenu'});
+        }
+
+        this.stopAnimating = function() {
+            this.stateHandler({type: 'finishAnimating'});
+        }
+
+        this.toggleShowTopButton = function() {
+            this.stateHandler({type: 'toggleShowTopButton'})
+        }
+    }
+
+    //javascript function for animating with css3
+    function animateElement(element, rule, seconds, params, callback) {
+        const animationDurationSecs = seconds + 's';
+        const animatedEvents = ['webkitAnimationEnd', 'animationend', 'oanimationend'];
+        const animationProps = {
+            animationName: rule,
+            webkitAnimationName: rule,
+            animationDuration: animationDurationSecs,
+            webkitAnimationDuration: animationDurationSecs
+        };
+
+        for (prop in animationProps){
+            element.style[prop] = animationProps[prop];
+        }
+
+        if (arguments.length === 4) {   //if there are only 4 arguments, the last argument can be extra css3 parameters, or a callback
+            if (typeof arguments[3] === 'function') {
+                callback = arguments[3];
+            }
+        }
+
+        if (params && typeof params === 'object') {
+            for (param in params) {
+                element.style[param] = params[param];
+            }
+        }
+
+        if(callback && typeof callback === 'function') {
+            animatedEvents.forEach(function(event){
+                element.addEventListener(event, callback);
+            })
+        }
+    }
+
+    //communicating with store to toggle the appropriate menu state, and animation 
+    function toggleMenuClickAnimation() {
+        const createPromise = function (selector, rule, params, resolveMsg) {
+            return new Promise(function(resolve) {
+                animateElement(document.querySelector(selector), rule, 0.5, params, function() {
+                    resolve(resolveMsg);
+                })
+            });
+        }
+
+        if (!store.stateHandler().menuAnimating) {
+            if(store.stateHandler().menuOpen) {
+                const params = {animationFillMode: 'forwards'};
+                const p1 = createPromise('#bar1', 'rotateDownToRight', params, 'bar1 finished');
+                const p2 = createPromise('#bar2', 'fadeOut', params, 'bar2 finished');
+                const p3 = createPromise('#bar3', 'rotateDownToLeft', params, 'bar3 finished');
+
+                store.closeMenu(); //signal to store that menu is closed and is animating
+
+                Promise.all([p1, p2, p3]).then(values => {
+                    //once all bars have finished animating, signal to the store
+                    store.stopAnimating();
+                    console.log(values, store.stateHandler());
+                });
+            } else {
+                const params = {animationFillMode: ''};
+                const p1 = createPromise('#bar1', 'rotateUpToRight', params, 'bar1 finished');
+                const p2 = createPromise('#bar2', 'fadeIn', params, 'bar2 finished');
+                const p3 = createPromise('#bar3', 'rotateUpToLeft', params, 'bar3 finished');
+                
+                store.openMenu(); //signal to store that menu is open and is animating
+
+                Promise.all([p1, p2, p3]).then(values => {
+                    //once all bars have finished animating, signal to the store
+                    store.stopAnimating();
+                    console.log(values, store.stateHandler());
+                });
+            }
+        }
+    }
+
+    function topScrollWatcher() {
+        function showScrollTopBotton() {
+            animateElement(document.querySelector('#scrollTop'),'topButtonAppear', 1, {animationFillMode: 'forwards'});
+        }
+
+        function hideScrollTopBotton() {
+            animateElement(document.querySelector('#scrollTop'),'topButtonHide', 1, {animationFillMode: ''});
+        }
+        if (window.scrollY <= 255 && store.stateHandler().showTopButton) {
+            store.toggleShowTopButton();
+            hideScrollTopBotton();
+        } else if(window.scrollY > 255 && !store.stateHandler().showTopButton) {
+            store.toggleShowTopButton();
+            showScrollTopBotton();
+        }
+    }
+
+    (function init() {
+        document.querySelector('#hamburger').addEventListener('click', toggleMenuClickAnimation, false);
+        document.querySelector('#scrollTop').addEventListener('click', function() {
+            window.scrollTo(0, 0);
+        }, false);
+        window.addEventListener("scroll", topScrollWatcher);
+    })();
+})()
+</script>
+</body>
+</html>
