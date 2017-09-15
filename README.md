@@ -1,5 +1,5 @@
 # Hamburger-Demo
-Just get the repo and open the index page. 
+A demo featuring ES6 Promises, CSS3 Animations, and Immutable State 
 
 git clone https://github.com/twmeggett/Hamburger-Demo.git
 
